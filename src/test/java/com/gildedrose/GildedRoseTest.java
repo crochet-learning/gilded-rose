@@ -88,4 +88,10 @@ class GildedRoseTest {
         assertEquals(0, item.quality);
     }
 
+    @Test
+    public void conjuredItemsDegradeTwiceAsFast() {
+        Item item = createAndUpdate(GildedRose.CONJURED, 15, 25);
+        assertEquals(23, item.quality);
+    }
+
 }
