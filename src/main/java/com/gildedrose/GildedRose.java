@@ -14,55 +14,66 @@ class GildedRose {
     public void updateQuality() {
         for (int i = 0; i < items.length; i++) {
             Item item = items[i];
-            if (!(isAgedBrie(item)
-                || isBackstagePass(item))) {
-                if (item.quality > 0) {
-                    if (!isHandOfRagnaros(item)) {
-                        item.quality--;
-                    }
-                }
+
+            if (isNormalItem(item)) {
+                handleNormalItem(item);
+            } else if (isAgedBrie(item)) {
+                handleAgedBrie(item);
+            } else if (isBackstagePass(item)) {
+                handleBackStagePass(item);
             } else {
-                if (item.quality < MAXIMUM_QUALITY) {
-                    item.quality++;
-
-                    if (isBackstagePass(item)) {
-                        if (item.sellIn < 11) {
-                            if (item.quality < MAXIMUM_QUALITY) {
-                                item.quality++;
-                            }
-                        }
-
-                        if (item.sellIn < 6) {
-                            if (item.quality < MAXIMUM_QUALITY) {
-                                item.quality++;
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (!isHandOfRagnaros(item)) {
-                item.sellIn--;
-            }
-
-            if (item.sellIn < 0) {
-                if (item.name.equals(AGED_BRIE)) {
-                    if (item.quality < MAXIMUM_QUALITY) {
-                        item.quality++;
-                    }
-                } else {
-                    if (isBackstagePass(item)) {
-                        item.quality = 0;
-                    } else {
-                        if (item.quality > 0) {
-                            if (!isHandOfRagnaros(item)) {
-                                item.quality--;
-                            }
+                if (!(isAgedBrie(item)
+                    || isBackstagePass(item))) {
+                    if (item.quality > 0) {
+                        if (!isHandOfRagnaros(item)) {
+                            item.quality--;
                         }
                     }
                 }
             }
         }
+    }
+
+    private void handleAgedBrie(Item item) {
+        if (item.quality == MAXIMUM_QUALITY) {
+        } else if (item.sellIn <= 0) {
+            item.quality = item.quality + 2;
+        } else {
+            item.quality++;
+        }
+        item.sellIn--;
+    }
+
+    private void handleBackStagePass(Item item) {
+        if (item.sellIn <= 0) {
+            item.quality = 0;
+        } else if (item.sellIn < 6) {
+            item.quality = item.quality + 3;
+        } else if (item.sellIn < 11) {
+            item.quality = item.quality + 2;
+        } else if (item.sellIn >= 11) {
+            item.quality++;
+        }
+
+        if (item.quality > MAXIMUM_QUALITY) {
+            item.quality = MAXIMUM_QUALITY;
+        }
+    }
+
+    private void handleNormalItem(Item item) {
+        item.sellIn--;
+        if (item.sellIn <= 0) {
+            item.quality = item.quality - 2;
+        } else {
+            item.quality--;
+        }
+        if (item.quality < 0) {
+            item.quality = 0;
+        }
+    }
+
+    private boolean isNormalItem(Item item) {
+        return !(isAgedBrie(item) || isBackstagePass(item) || isHandOfRagnaros(item));
     }
 
     private boolean isHandOfRagnaros(Item item) {
